@@ -2,6 +2,8 @@
 
 Adaptive trivia powered by [Laya](https://github.com/NandhaKishorM/laya)'s AI decision engine.
 
+**🎮 [Play Live](https://aryamanironman.github.io/laya-quiz/)**
+
 ## Quick Start
 
 ### Backend

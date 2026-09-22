@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { QuizState } from '../types';
+import type { QuizState } from '../types';
 
 interface Props extends QuizState { onRestart: () => void }
 

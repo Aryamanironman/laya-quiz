@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Question } from '../types';
+import type { Question } from '../types';
 import { DifficultyBadge } from './DifficultyBadge';
 
 interface Props {

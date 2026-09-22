@@ -7,7 +7,7 @@ import { ResultsScreen } from './components/ResultsScreen';
 import { useQuiz } from './hooks/useQuiz';
 import { useTimer } from './hooks/useTimer';
 import { useLayaDecision } from './hooks/useLayaDecision';
-import { Question, AnswerResult } from './types';
+import type { Question, AnswerResult } from './types';
 import { DEMO_QUESTIONS } from './data/questions';
 
 const TIME_LIMITS: Record<string, number> = { easy: 15, medium: 10, hard: 7 };

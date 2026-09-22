@@ -1,5 +1,5 @@
 import { useReducer, useCallback } from 'react';
-import { QuizState, QuizAction, AnswerResult, Question } from '../types';
+import type { QuizState, QuizAction, AnswerResult, Question } from '../types';
 
 const TOTAL_QUESTIONS = 10;
 

@@ -1,4 +1,4 @@
-import { Question } from '../types';
+import type { Question } from '../types';
 
 export const DEMO_QUESTIONS: Question[] = [
   {"id":"sci-1","category":"science","difficulty":"easy","question":"What planet is known as the Red Planet?","options":["Venus","Mars","Jupiter","Saturn"],"correctIndex":1,"explanation":"Mars appears red due to iron oxide on its surface."},

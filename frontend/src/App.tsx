@@ -8,6 +8,7 @@ import { useQuiz } from './hooks/useQuiz';
 import { useTimer } from './hooks/useTimer';
 import { useLayaDecision } from './hooks/useLayaDecision';
 import { Question, AnswerResult } from './types';
+import { DEMO_QUESTIONS } from './data/questions';
 
 const TIME_LIMITS: Record<string, number> = { easy: 15, medium: 10, hard: 7 };
 
@@ -26,7 +27,7 @@ function App() {
     fetch('/api/questions')
       .then((r) => r.json())
       .then(setAllQuestions)
-      .catch(() => {});
+      .catch(() => setAllQuestions(DEMO_QUESTIONS));
   }, []);
 
   const pickNext = useCallback(async () => {
@@ -79,6 +80,16 @@ function App() {
     }
   }, [timer.timeLeft, quiz.currentQuestion, answered]);
 
+  const computeLocalResult = (q: Question, idx: number, timeTaken: number, streak: number): AnswerResult => {
+    const correct = idx === q.correctIndex;
+    const base = { easy: 100, medium: 200, hard: 300 }[q.difficulty] || 100;
+    const speedBonus = Math.max(0, Math.round((15 - timeTaken) * 10));
+    const newStreak = correct ? streak + 1 : 0;
+    const multiplier = Math.min(newStreak, 5);
+    const points = correct ? (base + speedBonus) * Math.max(multiplier, 1) : 0;
+    return { correct, correctIndex: q.correctIndex, explanation: q.explanation, points, new_streak: newStreak };
+  };
+
   const handleAnswer = async (index: number) => {
     if (!quiz.currentQuestion || answeringRef.current) return;
     answeringRef.current = true;
@@ -90,29 +101,31 @@ function App() {
     const limit = TIME_LIMITS[quiz.currentQuestion.difficulty] || 15;
     const timeTaken = limit - timer.timeLeft;
 
+    let result: AnswerResult;
     try {
-      const result: AnswerResult = await submitAnswer({
+      const apiResult = await submitAnswer({
         question_id: quiz.currentQuestion.id,
         selected_index: index,
         time_taken: timeTaken,
         streak: quiz.streak,
       });
-      setExplanation(result.explanation);
-      quiz.answer(result, quiz.currentQuestion);
-
-      setTimeout(() => {
-        if (quiz.questionIndex + 1 >= 10) {
-          quiz.finish();
-        } else {
-          pickNext();
-        }
-      }, 2000);
+      // If backend returned valid result (not demo fallback)
+      if (apiResult.correct !== undefined && apiResult.explanation !== 'Backend offline — demo mode') {
+        result = apiResult;
+      } else {
+        result = computeLocalResult(quiz.currentQuestion, index, timeTaken, quiz.streak);
+      }
     } catch {
-      setTimeout(() => {
-        if (quiz.questionIndex + 1 >= 10) quiz.finish();
-        else pickNext();
-      }, 2000);
+      result = computeLocalResult(quiz.currentQuestion, index, timeTaken, quiz.streak);
     }
+
+    setExplanation(result.explanation);
+    quiz.answer(result, quiz.currentQuestion);
+
+    setTimeout(() => {
+      if (quiz.questionIndex + 1 >= 10) quiz.finish();
+      else pickNext();
+    }, 2000);
   };
 
   if (quiz.phase === 'start') return <StartScreen onStart={quiz.start} />;

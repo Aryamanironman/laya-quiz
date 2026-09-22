@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 function stripCrossorigin() {
   return {
     name: 'strip-crossorigin',
-    transformIndexHtml(html) {
+    transformIndexHtml(html: string) {
       return html.replaceAll(' crossorigin', '')
     },
   }
